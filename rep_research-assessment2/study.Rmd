@@ -1,0 +1,62 @@
+---
+title: "Do you know the most severe weather events?"
+output: pdf_document
+---
+
+## Synopsis
+
+Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
+
+This study will present the most severe weather event types that influence US population health and economic consequences.
+
+## Data processing
+
+The study is based on the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database, which covers the dates between 1950 and end in November 2011.
+
+```{r cache = TRUE, warning = FALSE}
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", "StormData.csv.bz2", "curl")
+data_file <- bzfile("StormData.csv.bz2", "r")
+data <- read.csv(data_file)
+```
+
+## Results
+
+The following sections will present the 10 most influential weather event types regarding:
+  - US public health
+  - US economy
+
+### Influences to US public health
+
+What are the 10 most leathal weather event types?
+
+```{r}
+fat_by_et <- tapply(data$FATALITIES, list(data$EVTYPE), sum)
+fat_by_et_dec <- fat_by_et[order(fat_by_et, decreasing = TRUE)]
+par(mar = c(5.1, 6.1, 4.1, 2.1))
+barplot(rev(fat_by_et_dec[1:10]), main = "Fatalities", horiz = TRUE,
+        col = "cornflowerblue", cex.names = 0.5, las = 2)
+```
+
+What are the 10 most dangerous weather event types causing injuries?
+
+```{r}
+inj_by_et <- tapply(data$INJURIES, list(data$EVTYPE), sum)
+inj_by_et_dec <- inj_by_et[order(inj_by_et, decreasing = TRUE)]
+par(mar = c(5.1, 6.1, 4.1, 2.1))
+barplot(rev(inj_by_et_dec[1:10]), main = "Injuries", horiz = TRUE,
+        col = "cornflowerblue", cex.names = 0.5, las = 2)
+```
+
+### Influences to US economy
+
+What are the 10 strongest weather event types affecting US economy?
+
+```{r}
+eco_dmg <- apply(data[, c("PROPDMG", "CROPDMG")], 1, sum)
+eco_by_et <- tapply(eco_dmg, list(data$EVTYPE), sum)
+eco_by_et_dec <- eco_by_et[order(eco_by_et, decreasing = TRUE)]
+par(mar = c(5.1, 6.1, 4.1, 2.1))
+barplot(rev(eco_by_et_dec[1:10]), main = "Economic damage", horiz = TRUE,
+        col = "cornflowerblue", cex.names = 0.5, las = 2)
+```
+
